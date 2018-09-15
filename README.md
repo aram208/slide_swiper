@@ -16,7 +16,7 @@ pip install -r requirements.txt
 ```
 
 ### Step 4
-Open up the conf.json file and put the url and title for your slides (Google slides only!)
+Open up the `conf.json` file and put the url and title for your slides (Google slides only!)
 
 #### Step 5
 ````
@@ -25,4 +25,8 @@ python swipe_detect.py
 
 ## How it works
 _...smoothly_
+<br>
 https://drive.google.com/open?id=1qph97lkD3nvk0jrBQ_h_VYYsSu4cN3Ol
+
+## Tips
+The algorithm is using the concept of running average
