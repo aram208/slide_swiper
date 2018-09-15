@@ -30,4 +30,4 @@ https://drive.google.com/open?id=1qph97lkD3nvk0jrBQ_h_VYYsSu4cN3Ol
 
 ## Tips
 The algorithm is using the concept of _running average_. 
-When starting, make sure to not have any moving objects in the ROI area of the screen for a second or two (the red boxed are at the top right part which tracks the hand movement).
+When starting, make sure to not have any moving objects in the ROI area of the screen for a second or two (the red boxed area at the top right part which tracks the hand movement).
