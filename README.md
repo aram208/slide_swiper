@@ -7,9 +7,7 @@ Python 3.6, OpenCV, Selenium
 Clone this repo and cd into it
 
 ### Step 2
-Download the latest chrome driver from: http://chromedriver.chromium.org/downloads and put it anywhere on your file system. I usually put it under the _utils_ folder.
-
-Modify the conf.json to point to the newly downloaded chrome driver.
+Download the latest chrome driver from: http://chromedriver.chromium.org/downloads and put it anywhere on your file system. Modify the conf.json to point to the newly downloaded chrome driver.
 
 ### Step 3
 Install the necessary packages
@@ -27,3 +25,4 @@ python swipe_detect.py
 
 ## How it works
 _...smoothly_
+https://drive.google.com/open?id=1qph97lkD3nvk0jrBQ_h_VYYsSu4cN3Ol
