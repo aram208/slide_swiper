@@ -51,7 +51,7 @@ while True:
             detection_in_progress = True
             (thresh, c) = hand
             cv2.drawContours(clone, [c + (right, top)], -1, (0, 255, 0), 2)
-            cv2.imshow("Thresh", thresh)
+            # cv2.imshow("Thresh", thresh)
             # print the coordinates of the center of mass of the contour
             (cX, cY) = swipe_detector.detect(thresh, c)
             x1 = cX + right

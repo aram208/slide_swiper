@@ -21,11 +21,9 @@ class MotionDetector:
 
     def detect(self, image, tValue = 25):
         # compute the absolute difference between the background model and the image
-        # passed in, then threshold the delta image
         delta = cv2.absdiff(self.bg.astype("uint8"), image)
         threshold = cv2.threshold(delta, tValue, 255, cv2.THRESH_BINARY)[1]
-
-        contours = cv2.findContours(threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
+        _, contours, _ = cv2.findContours(threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         if len(contours) == 0:
             return None
