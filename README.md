@@ -10,7 +10,7 @@ Clone this repo and cd into it
 Download the latest chrome driver from: http://chromedriver.chromium.org/downloads and put it anywhere on your file system. Modify the conf.json to point to the newly downloaded chrome driver.
 
 ### Step 3
-Install the necessary packages
+Activate your virtual environment, if using one, and install the necessary packages.
 ```
 pip install -r requirements.txt
 ```
