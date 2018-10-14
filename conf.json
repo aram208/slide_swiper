@@ -3,5 +3,12 @@
     "threshold": 30,
     "chromedriver_path": "utils/chromedriver/2.42/chromedriver",
     "slide_url": "https://docs.google.com/presentation/d/1Q1Xgow5Jg3SZRslU__anM-RtcJams-i_0tzVpsl4gH0/edit?usp=sharing",
-    "slide_title": "swipe_test - Google Slides"
+    "slide_title": "swipe_test - Google Slides",
+    "face_detect":{
+        "detector": "face_detect/face_detection_model",
+        "embedding_model": "face_detect/openface_nn4.small2.v1.t7",
+        "recognizer": "face_detect/output/recognizer.pickle",
+        "le": "face_detect/output/le.pickle",
+        "confidence": 0.6
+    }
 }

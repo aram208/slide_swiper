@@ -1,6 +1,7 @@
 from utils import MotionDetector
 from utils import SwipeDetector
 from utils.selenium.slidemanager import SlideManager
+from face_detect import FaceDetector
 import numpy as np
 import argparse
 import imutils
@@ -14,6 +15,13 @@ args = vars(ap.parse_args())
 # ---------------------------
 
 cfg = json.loads(open(args["config"]).read())
+
+face_detector = FaceDetector(
+    cfg["face_detect"]["detector"], 
+    cfg["face_detect"]["embedding_model"], 
+    cfg["face_detect"]["recognizer"],
+    cfg["face_detect"]["le"],
+    cfg["face_detect"]["confidence"])
 
 camera = cv2.VideoCapture(0) # 0 for internal webcam, 1 for external
 
@@ -35,6 +43,14 @@ while True:
 
     frame = imutils.resize(frame, width = 600)
     frame = cv2.flip(frame, 1)
+
+    text, (startX, startY, endX, endY) = face_detector.detect_and_recognize(frame)
+
+    if text is not None:
+        y = startY - 10 if startY - 10 > 10 else startY + 10
+        cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), 2)
+        cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+
     clone = frame.copy()
     (frameHeight, frameWidth) = frame.shape[:2]
 
