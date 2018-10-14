@@ -38,74 +38,90 @@ detection_in_progress = False
 x_start = 0
 x_end = 0
 
+presenters = cfg["face_detect"]["presenters"]
+
+print("[INFO] Authorized presenters: {}".format(presenters))
+
 while True:
     (is_success, frame) = camera.read()
 
     frame = imutils.resize(frame, width = 600)
     frame = cv2.flip(frame, 1)
 
-    text, (startX, startY, endX, endY) = face_detector.detect_and_recognize(frame)
-
-    if text is not None:
-        y = startY - 10 if startY - 10 > 10 else startY + 10
-        cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), 2)
-        cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-
-    clone = frame.copy()
-    (frameHeight, frameWidth) = frame.shape[:2]
-
-    roi = frame[top:bottom, right:left]
-    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (7, 7), 0)
+    name, confidence, (startX, startY, endX, endY) = face_detector.detect_and_recognize(frame)
+    text = "{}: {}".format(name, confidence)
 
     if number_of_frames < 32:
+        clone = frame.copy()
+        (frameHeight, frameWidth) = frame.shape[:2]
+
+        roi = frame[top:bottom, right:left]
+        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        gray = cv2.GaussianBlur(gray, (7, 7), 0)
         motion_detector.update_background(gray)
 
     else:
-        hand = motion_detector.detect(gray, float(cfg["threshold"]))
-        if hand is not None:
-            detection_in_progress = True
-            (thresh, c) = hand
-            cv2.drawContours(clone, [c + (right, top)], -1, (0, 255, 0), 2)
-            # cv2.imshow("Thresh", thresh)
-            # print the coordinates of the center of mass of the contour
-            (cX, cY) = swipe_detector.detect(thresh, c)
-            x1 = cX + right
-            y1 = cY + top
-            cv2.circle(clone, (x1, y1), 10, (0, 255, 0), -1)
-            
-            #X.append(x1)
-            
-            if x_start == 0:
-                x_start = x1
-            else:
-                x_end = x1
 
-        else:
-            if detection_in_progress:
-                # To determine the direction, 
-                # Option 1: compute the average X and compare it to the last X registered
-                # Option 2: just compare the first and last x coordinates
+        if name in presenters:
+            y = startY - 10 if startY - 10 > 10 else startY + 10
+            cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+            cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 255, 0), 2)
+            
+            clone = frame.copy()
+            (frameHeight, frameWidth) = frame.shape[:2]
+
+            roi = frame[top:bottom, right:left]
+            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            gray = cv2.GaussianBlur(gray, (7, 7), 0)
+
+            hand = motion_detector.detect(gray, float(cfg["threshold"]))
+            if hand is not None:
+                detection_in_progress = True
+                (thresh, c) = hand
+                cv2.drawContours(clone, [c + (right, top)], -1, (0, 255, 0), 2)
+                # cv2.imshow("Thresh", thresh)
+                # print the coordinates of the center of mass of the contour
+                (cX, cY) = swipe_detector.detect(thresh, c)
+                x1 = cX + right
+                y1 = cY + top
+                cv2.circle(clone, (x1, y1), 10, (0, 255, 0), -1)
                 
-                # Option 1:
-                # average = sum(X) / len(X)
-                #print("min: {}, max: {}".format(min(X[:midpoint]), max(X[midpoint:])))
-                #if X[-1:] > average:
+                #X.append(x1)
                 
-                # Option 2:
-                if x_start < x_end:
-                    print("-> right swipe detected")
-                    slide_manager.move_right()
+                if x_start == 0:
+                    x_start = x1
                 else:
-                    print("<- left swipe detected")
-                    slide_manager.move_left()
-                
-                # reset the X (that is if using optoin 1 described above)
-                #X.clear()
-                x_start = 0
-                x_end = 0
-                detection_in_progress = False
+                    x_end = x1
 
+            else:
+                if detection_in_progress:
+                    # To determine the direction, 
+                    # Option 1: compute the average X and compare it to the last X registered
+                    # Option 2: just compare the first and last x coordinates
+                    
+                    # Option 1:
+                    # average = sum(X) / len(X)
+                    #print("min: {}, max: {}".format(min(X[:midpoint]), max(X[midpoint:])))
+                    #if X[-1:] > average:
+                    
+                    # Option 2:
+                    if x_start < x_end:
+                        print("-> right swipe detected")
+                        slide_manager.move_right()
+                    else:
+                        print("<- left swipe detected")
+                        slide_manager.move_left()
+                    
+                    # reset the X (that is if using optoin 1 described above)
+                    #X.clear()
+                    x_start = 0
+                    x_end = 0
+                    detection_in_progress = False
+        else:
+            y = startY - 10 if startY - 10 > 10 else startY + 10
+            cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), 2)
+            cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            clone = frame.copy()
 
 
     cv2.rectangle(clone, (left, top), (right, bottom), (0, 0, 255), 2)
