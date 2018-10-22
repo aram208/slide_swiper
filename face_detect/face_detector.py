@@ -59,4 +59,4 @@ class FaceDetector:
                 #cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
                 return name, confidence, (startX, startY, endX, endY)
             else:
-                return None, None
+                return None, None, (0, 0, 0, 0)
