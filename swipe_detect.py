@@ -25,7 +25,8 @@ face_detector = FaceDetector(
 
 camera = cv2.VideoCapture(0) # 0 for internal webcam, 1 for external
 
-(top, right, bottom, left) = np.int32(cfg["bounding_box"].split(","))
+(top_h, right_h, bottom_h, left_h) = np.int32(cfg["bounding_box_hand"].split(","))
+(top_f, right_f, bottom_f, left_f) = np.int32(cfg["bounding_box_face"].split(","))
 
 motion_detector = MotionDetector()
 swipe_detector = SwipeDetector()
@@ -48,42 +49,45 @@ while True:
     frame = imutils.resize(frame, width = 600)
     frame = cv2.flip(frame, 1)
 
-    name, confidence, (startX, startY, endX, endY) = face_detector.detect_and_recognize(frame)
-    text = "{}: {}".format(name, confidence)
+    roi_hand = frame[top_h:bottom_h, right_h:left_h]
+    roi_face = frame[top_f:bottom_f, right_f:left_f]
 
     if number_of_frames < 32:
         clone = frame.copy()
         (frameHeight, frameWidth) = frame.shape[:2]
-
-        roi = frame[top:bottom, right:left]
-        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(roi_hand, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
         motion_detector.update_background(gray)
 
     else:
 
-        if name in presenters:
-            y = startY - 10 if startY - 10 > 10 else startY + 10
-            cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
-            cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 255, 0), 2)
-            
-            clone = frame.copy()
-            (frameHeight, frameWidth) = frame.shape[:2]
+        name, confidence, (startX, startY, endX, endY) = face_detector.detect_and_recognize(roi_face)
+        text = "{}: {}".format(name, confidence)
 
-            roi = frame[top:bottom, right:left]
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        if name in presenters:            
+            clone = frame.copy()
+
+            cv2.rectangle(clone, (left_f, top_f), (right_f, bottom_f), (0, 255, 0), 2) # the box for face detection
+            y = startY - 10 if startY - 10 > 10 else startY + 10
+            #cv2.rectangle(clone, (startX, startY), (endX, endY), (0, 255, 0), 2) # the box around the face
+            cv2.putText(clone, text, (right_f + 10, bottom_f - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 255, 0), 2)
+
+            (frameHeight, frameWidth) = frame.shape[:2]
+            cv2.rectangle(clone, (left_h, top_h), (right_h, bottom_h), (0, 255, 0), 2) # the box for hand detection
+
+            gray = cv2.cvtColor(roi_hand, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(gray, (7, 7), 0)
 
             hand = motion_detector.detect(gray, float(cfg["threshold"]))
             if hand is not None:
                 detection_in_progress = True
                 (thresh, c) = hand
-                cv2.drawContours(clone, [c + (right, top)], -1, (0, 255, 0), 2)
+                cv2.drawContours(clone, [c + (right_h, top_h)], -1, (0, 255, 0), 2)
                 # cv2.imshow("Thresh", thresh)
                 # print the coordinates of the center of mass of the contour
                 (cX, cY) = swipe_detector.detect(thresh, c)
-                x1 = cX + right
-                y1 = cY + top
+                x1 = cX + right_h
+                y1 = cY + top_h
                 cv2.circle(clone, (x1, y1), 10, (0, 255, 0), -1)
                 
                 #X.append(x1)
@@ -119,12 +123,14 @@ while True:
                     detection_in_progress = False
         else:
             y = startY - 10 if startY - 10 > 10 else startY + 10
-            cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), 2)
-            cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            #cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), 2)
+            cv2.putText(frame, text, (right_f + 10, bottom_f - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
             clone = frame.copy()
+            cv2.rectangle(clone, (left_h, top_h), (right_h, bottom_h), (0, 0, 255), 2)
+            cv2.rectangle(clone, (left_f, top_f), (right_f, bottom_f), (0, 0, 255), 2)
 
 
-    cv2.rectangle(clone, (left, top), (right, bottom), (0, 0, 255), 2)
+    #cv2.rectangle(clone, (left, top), (right, bottom), (0, 0, 255), 2)
     number_of_frames += 1
 
     cv2.imshow("Frame", clone)

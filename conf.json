@@ -1,5 +1,6 @@
 {
-    "bounding_box": "10,350,225,590",
+    "bounding_box_hand": "10,350,225,590",
+    "bounding_box_face": "10,100,225,340",
     "threshold": 30,
     "chromedriver_path": "utils/chromedriver/2.42/chromedriver",
     "slide_url": "https://docs.google.com/presentation/d/1Q1Xgow5Jg3SZRslU__anM-RtcJams-i_0tzVpsl4gH0/edit?usp=sharing",
