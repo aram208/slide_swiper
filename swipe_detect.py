@@ -52,8 +52,11 @@ while True:
     roi_hand = frame[top_h:bottom_h, right_h:left_h]
     roi_face = frame[top_f:bottom_f, right_f:left_f]
 
-    if number_of_frames < 32:
-        clone = frame.copy()
+    clone = frame.copy()
+    cv2.rectangle(clone, (left_f, top_f), (right_f, bottom_f), (255, 0, 0), 2) # the box for face detection
+
+    if number_of_frames < 64:
+        #clone = frame.copy()
         (frameHeight, frameWidth) = frame.shape[:2]
         gray = cv2.cvtColor(roi_hand, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
@@ -64,12 +67,9 @@ while True:
         name, confidence, (startX, startY, endX, endY) = face_detector.detect_and_recognize(roi_face)
         text = "{}: {}".format(name, confidence)
 
-        if name in presenters:            
-            clone = frame.copy()
-
-            cv2.rectangle(clone, (left_f, top_f), (right_f, bottom_f), (0, 255, 0), 2) # the box for face detection
+        if name in presenters:                        
             y = startY - 10 if startY - 10 > 10 else startY + 10
-            #cv2.rectangle(clone, (startX, startY), (endX, endY), (0, 255, 0), 2) # the box around the face
+            cv2.rectangle(clone, (startX + 100, startY), (endX + 100, endY), (0, 255, 0), 2) # the box around the face
             cv2.putText(clone, text, (right_f + 10, bottom_f - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 255, 0), 2)
 
             (frameHeight, frameWidth) = frame.shape[:2]
@@ -109,11 +109,11 @@ while True:
                     #if X[-1:] > average:
                     
                     # Option 2:
-                    if x_start < x_end:
-                        print("-> right swipe detected")
+                    if x_start > x_end:
+                        print("<- left swipe detected")
                         slide_manager.move_right()
                     else:
-                        print("<- left swipe detected")
+                        print("-> right swipe detected")
                         slide_manager.move_left()
                     
                     # reset the X (that is if using optoin 1 described above)
@@ -125,9 +125,7 @@ while True:
             y = startY - 10 if startY - 10 > 10 else startY + 10
             #cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), 2)
             cv2.putText(frame, text, (right_f + 10, bottom_f - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-            clone = frame.copy()
             cv2.rectangle(clone, (left_h, top_h), (right_h, bottom_h), (0, 0, 255), 2)
-            cv2.rectangle(clone, (left_f, top_f), (right_f, bottom_f), (0, 0, 255), 2)
 
 
     #cv2.rectangle(clone, (left, top), (right, bottom), (0, 0, 255), 2)
